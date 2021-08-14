@@ -14,7 +14,7 @@ mongoose.connect(url,{useNewUrlParser:true,useUnifiedTopology: true})
 const data = require('./schema.js')
 // import shortid
 let shortid = require('shortid')
-// function get
+// get
 app.get('/', async (req,res)=>{
     const list = await data.find()
     res.send({
@@ -22,7 +22,7 @@ app.get('/', async (req,res)=>{
         message:"found them"
     })
 })
-// post 
+// post
 app.post('/', async (req,res)=>{
     const list = await new data(req.body, {_id:shortid.generate()})
     await list.save()
@@ -42,6 +42,33 @@ app.put('/',async (req,res)=>{
 // delete
 app.delete('/', async (req,res)=>{
     const list = await data.deleteOne(req.body)
+    res.status(200).send({
+        list,
+        message:"user deleted"
+    })
+})
+
+// using id's
+// fucntion get using id
+app.get('/:_id', async (req,res)=>{
+    // res.send(req.params)
+    const list = await data.find(req.params)
+    res.send({
+        list,
+        message:"found it"
+    })
+})
+// put using id
+app.put('/:_id',async (req,res)=>{
+    const list = await data.updateOne(req.params,req.body)
+    res.send({
+        list,
+        message:"user updated"
+    })
+})
+// delete with id
+app.delete('/:_id', async (req,res)=>{
+    const list = await data.deleteOne(req.params)
     res.status(200).send({
         list,
         message:"user deleted"
