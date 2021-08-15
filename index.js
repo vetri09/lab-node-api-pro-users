@@ -11,9 +11,10 @@ const mongoose = require('mongoose')
 // connect mongoose to atlas
 mongoose.connect(url,{useNewUrlParser:true,useUnifiedTopology: true})
 // get schema
-const data = require('./schema.js')
+const data = require('./models/schema.js')
 // import shortid
 let shortid = require('shortid')
+
 // get
 app.get('/', async (req,res)=>{
     const list = await data.find()
@@ -26,7 +27,7 @@ app.get('/', async (req,res)=>{
 app.post('/', async (req,res)=>{
     const list = await new data(req.body, {_id:shortid.generate()})
     await list.save()
-    res.send({
+    res.status(201).send({
         list,
         message:"added them"
     })
