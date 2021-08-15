@@ -4,14 +4,8 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 // create new schema
 const schemaData = new Schema({
-    name:{
-        type:String,
-        required:true
-    },
-    email:{
-        type:String,
-        required:true
-    },
+    name:{type:String,required:true},
+    email:{type:String,required:true},
     age:Number,
     prograd_id:Number,
     squad:Number

@@ -12,28 +12,81 @@ const mongoose = require('mongoose')
 mongoose.connect(url,{useNewUrlParser:true,useUnifiedTopology: true})
 // get schema
 const data = require('./models/schema.js')
-// import shortid
-let shortid = require('shortid')
+// // import shortid
+// let shortid = require('shortid')
+// // idk man - shortid
 
-// get
-app.get('/', async (req,res)=>{
-    const list = await data.find()
-    res.send({
-        list,
-        message:"found them"
+// get - done
+app.get('/users', async (req,res)=>{
+    const list = await data.find({},{name:1,email:1,age:1,prograd_id:1,squad:1,_id:1})
+    .then(result=>{
+        res.send({
+            result,
+            message:"found them"
+        })
+    }).catch(err=>{
+        res.status(500).send({
+            error: err,
+            errorMessage: "The users information could not be retrieved."
+        })
     })
 })
-// post
-app.post('/', async (req,res)=>{
-    const list = await new data(req.body, {_id:shortid.generate()})
-    await list.save()
-    res.status(201).send({
-        list,
-        message:"added them"
+// get using id - done
+app.get('/users/:_id', async (req,res)=>{
+    // res.send(req.params)
+    const list = await data.find(req.params)
+    .then(result=>{
+        res.send({
+            result,
+            message:"found it"
+        })
+    }).catch(err=>{
+        res.status(404).send({
+            error:err,
+            message: "The user with the specified ID does not exist." 
+        })
     })
 })
+// post - done
+app.post('/users', async (req,res)=>{
+    const list = await new data({
+        // _id:shortid.generate(),
+        name:req.body.name,
+        email:req.body.email,
+        age:req.body.age,
+        prograd_id:req.body.prograd_id,
+        squad:req.body.squad
+    }).save().then(result=>{
+        res.status(201).send({
+            message:"added them",
+            created:result
+        })
+    }).catch(err=>{
+        res.status(400).send({
+            errorMessage: "Please provide name and bio for the user.",
+            error: err
+        })
+    })
+})
+// delete with id - done
+app.delete('/users/:_id', async (req,res)=>{
+    const list = await data.deleteOne(req.params)
+    .then(result=>{
+        res.status(200).send({
+            result,
+            message:"user deleted"
+        })
+    }).catch(err=>{
+        res.status(404).send({
+            error: err,
+            message: "The user with the specified ID does not exist."
+        })
+    })
+})
+
+
 // put
-app.put('/',async (req,res)=>{
+app.put('/users',async (req,res)=>{
     const list = await data.updateOne({name:"vetrivelan2"},req.body)
     res.send({
         list,
@@ -41,38 +94,27 @@ app.put('/',async (req,res)=>{
     })
 })
 // delete
-app.delete('/', async (req,res)=>{
+app.delete('/users', async (req,res)=>{
     const list = await data.deleteOne(req.body)
     res.status(200).send({
         list,
         message:"user deleted"
     })
 })
-
-// using id's
-// fucntion get using id
-app.get('/:_id', async (req,res)=>{
-    // res.send(req.params)
-    const list = await data.find(req.params)
-    res.send({
-        list,
-        message:"found it"
-    })
-})
 // put using id
-app.put('/:_id',async (req,res)=>{
+app.put('/users/:_id',async (req,res)=>{
     const list = await data.updateOne(req.params,req.body)
-    res.send({
-        list,
-        message:"user updated"
+    .then(result=>{
+        res.status(200).send({
+            result,
+            message:"user updated"
+        })
+    }).catch(err=>{
+        res.status(404).send({
+            error:err,
+            message: "The user with the specified ID does not exist."
+        }) 
     })
 })
-// delete with id
-app.delete('/:_id', async (req,res)=>{
-    const list = await data.deleteOne(req.params)
-    res.status(200).send({
-        list,
-        message:"user deleted"
-    })
-})
+
 .listen(3000,()=>console.log('server at 3000'))
